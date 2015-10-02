@@ -1,0 +1,637 @@
+<?php session_start(); ?>
+<style type="text/css">
+#vendor-registration .validation-advice{margin-top:3px;font-style:italic;font-size:12px;font-weight:500;}
+</style>
+<?php
+
+$baseurl=Mage::getBaseUrl();
+
+$resource = Mage::getSingleton('core/resource');
+
+$writeConnection = $resource->getConnection('core_write');
+
+$table = $resource->getTableName('vendor_user');
+
+
+
+$mediaURL = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA);
+
+
+
+
+
+
+
+if(isset($_REQUEST['btnSubmit'])){
+
+	
+
+	//print "<pre>"; print_r($_REQUEST); print "</pre>";
+
+	$uploadImageURL = "media/uploads/".$_REQUEST['hdnMainImage'];
+
+	//exit;
+
+	//print "<pre>"; print_r($_REQUEST); print "</pre>";
+
+	
+
+	Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+
+	$product = Mage::getModel('catalog/product');
+
+	
+
+	/* ############### START CODE TO GET OPTION ID ################# */
+
+	// use your own attribute code here 
+
+	$customer = Mage::getSingleton('customer/session')->getCustomer();
+	$pa = explode("@",$customer->getEmail());
+	$cust_name_owner = $pa[0] ;
+
+	$attribute_code = "owner_product"; 
+
+	$attribute_details = Mage::getSingleton("eav/config")->getAttribute("catalog_product", $attribute_code); 
+
+	$options = $attribute_details->getSource()->getAllOptions(false); 
+
+	foreach($options as $option){ 
+
+		// print_r($option) and find all the elements 
+
+		if($cust_name_owner==$option["label"]){
+
+			$option_id = $option["value"]; 
+
+		}
+
+		//echo $option["value"]; 
+
+		//echo $option["label"]; 
+
+	} 
+	/* ############### END CODE TO GET OPTION ID ############# */
+
+	try{
+
+		$product
+			->setStoreId(1) //you can set data in store scope
+			->setWebsiteIds(array(1)) //website ID the product is assigned to, as an array
+			->setAttributeSetId(9) //ID of a attribute set named 'default'
+			->setTypeId('simple') //product type
+			->setCreatedAt(strtotime('now')) //product creation time
+		//    ->setUpdatedAt(strtotime('now')) //product update time
+			->setSku($_REQUEST['txtProductSKU']) //SKU
+			->setName($_REQUEST['txtProductName']) //product name
+			->setWeight(0.0000)
+			->setStatus(1) //product status (1 - enabled, 2 - disabled)
+			->setTaxClassId(0) //tax class (0 - none, 1 - default, 2 - taxable, 4 - shipping)
+			->setVisibility(Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH) //catalog and search visibility
+			->setOwner_product($option_id)
+			->setIsbn($_REQUEST['txtIsbn'])
+			->setPublisher($_REQUEST['txtPublisher'])
+			->setAuthor($_REQUEST['txtAuthorName'])
+			->setYear($_REQUEST['txtYear'])
+			->setEdition($_REQUEST['txtEdition'])
+			//->setManufacturer(28) //manufacturer id
+			//->setColor(24)
+			//->setNewsFromDate('06/26/2014') //product set as new from
+			//->setNewsToDate('06/30/2014') //product set as new to
+			//->setCountryOfManufacture('AF') //country of manufacture (2-letter country code)
+			->setBook_condition($_REQUEST['cmbbook_condition'])
+			->setPrice($_REQUEST['txtRegularPrice']) //price in form 11.22
+			//->setCost($_REQUEST['txtCost']) //price in form 11.22
+			->setSpecialPrice($_REQUEST['txtSpecialPrice']) //special price in form 11.22
+			->setSpecialFromDate(strtotime('now')) //special price from (MM-DD-YYYY)
+			//->setSpecialToDate('06/30/2014') //special price to (MM-DD-YYYY)
+			//->setMsrpEnabled(1) //enable MAP
+			//->setMsrpDisplayActualPriceType(1) //display actual price (1 - on gesture, 2 - in cart, 3 - before order confirmation, 4 - use config)
+			//->setMsrp(99.99) //Manufacturer's Suggested Retail Price
+			//->setMetaTitle($_REQUEST['txtMetaTitle'])
+			//->setMetaKeyword($_REQUEST['txtMetaKeyword'])
+			//->setMetaDescription($_REQUEST['textareaMetaDescription'])
+			//->setDescription($_REQUEST['textareaDescription'])
+			//->setShortDescription($_REQUEST['textareaShortDescription'])
+			->setMediaGallery (array('images'=>array (), 'values'=>array ())) //media gallery initialization
+			->addImageToMediaGallery($uploadImageURL, array('image','thumbnail','small_image'), false, false) //assigning image, thumb and small image to media gallery
+			->setStockData(array(
+							   'use_config_manage_stock' => 0, //'Use config settings' checkbox
+							   'manage_stock'=>1, //manage stock
+							   //'min_sale_qty'=>1, //Minimum Qty Allowed in Shopping Cart
+							   //'max_sale_qty'=>2, //Maximum Qty Allowed in Shopping Cart
+							   'is_in_stock' => 1, //Stock Availability
+							   'qty' => $_REQUEST['txtStock'] //qty
+						   )
+
+			)
+			->setCategoryIds($_REQUEST['chkCategory']); //assign product to categories
+			$product->save();
+			
+			$_SESSION['msg'] = "Product is saved successfully.";
+
+			header("Location:" . $baseurl.'product');
+
+			exit;
+
+		//endif;
+
+		}catch(Exception $e){
+			echo $e->getMessage();
+			Mage::log($e->getMessage());
+
+		}
+
+}
+
+?>
+
+
+
+<script type="text/javascript" src="<?php echo $this->getSkinUrl();?>css/vendor/js/ajaxupload.3.5.js"></script>
+
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl();?>css/vendor/jquery.idealforms.min.css" type="text/css" />
+
+
+
+<div id="main">
+
+	<div class="container clearfix">
+
+        <div class="row">
+
+        	<div class="ideal-wrap">
+
+               <h2>ADD BOOK</h2>
+
+            </div>
+
+            <div class="ideal-wrap" style="float:right;">
+
+                <a style="display:inline-block;font-size: 100%;margin-top: 10px;padding: 10px;text-decoration: none;" class="ideal-button" href="<?php echo $this->getBaseUrl().'product'?>">Back</a>
+
+            </div>
+
+        	<form id="vendor-registration" name="vendor-registration" style="visibility: visible;" class="ideal-form" method="post">
+
+                <!-- Start Field -->
+
+                <div class="ideal-wrap">
+
+                	<label class="ideal-label customwidth required"><b>* </b>Book Name</label>
+
+                	<span class="ideal-field">
+
+                		<input type="text" name="txtProductName" id="txtProductName" autocomplete="off" style="width:450px;" class="input-text required-entry">
+
+                	</span>
+
+                </div>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <div class="ideal-wrap" style="display:none;">
+
+                	<label class="ideal-label customwidth">Book SKU</label>
+
+                	<span class="ideal-field">
+
+                		<input type="text" name="txtProductSKU" id="txtProductSKU" autocomplete="off" value="<?php echo $timestamp=strtotime("now"); ?>">
+
+                	</span>
+
+                </div>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <?php /*?><div class="ideal-wrap" style="display:none;">
+
+                	<label class="ideal-label customwidth">Short Description</label>
+
+                	<span class="ideal-field">
+
+                		<textarea id="textareaShortDescription" name="textareaShortDescription" style="width:450px;height:180px;"></textarea>
+
+                	</span>
+
+                </div><?php */?>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <?php /*?><div class="ideal-wrap" style="display:none;">
+
+                	<label class="ideal-label customwidth">Description</label>
+
+                	<span class="ideal-field">
+
+                		<textarea id="textareaDescription" name="textareaDescription" style="width:450px;height:180px;"></textarea>
+
+                	</span>
+
+                </div><?php */?>
+
+                <!-- End Field -->
+                
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth required"><b>* </b>ISBN</label>
+                	<span class="ideal-field">
+                    	<input type="text" name="txtIsbn" id="txtIsbn" autocomplete="off" class="input-text required-entry">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth required"><b>* </b>Publisher</label>
+                	<span class="ideal-field">
+                    	<input type="text" name="txtPublisher" id="txtPublisher" autocomplete="off" class="input-text required-entry">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth required"><b>* </b>Author Name</label>
+                	<span class="ideal-field">
+                    	<input type="text" name="txtAuthorName" id="txtAuthorName" autocomplete="off" class="input-text required-entry">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth required"><b>* </b>Year</label>
+                	<span class="ideal-field">
+                    	<input type="text" name="txtYear" id="txtYear" autocomplete="off" class="input-text required-entry validate-number">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth required"><b>* </b>Edition</label>
+                	<span class="ideal-field">
+                    	<input type="text" name="txtEdition" id="txtEdition" autocomplete="off" class="input-text required-entry">
+                	</span>
+                </div>
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <div class="ideal-wrap">
+
+                	<label class="ideal-label customwidth required"><b>* </b>Regular Price</label>
+
+                	<span class="ideal-field">
+
+                    	<input type="text" name="txtRegularPrice" id="txtRegularPrice" autocomplete="off" class="input-text required-entry validate-number">
+
+                	</span>
+
+                </div>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <div class="ideal-wrap">
+
+                	<label class="ideal-label customwidth required"><b>* </b>Special Price</label>
+
+                	<span class="ideal-field">
+
+                    	<input type="text" name="txtSpecialPrice" id="txtSpecialPrice" autocomplete="off" class="input-text required-entry validate-number">
+
+                	</span>
+
+                </div>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <?php /*?><div class="ideal-wrap" style="display:none;">
+
+                	<label class="ideal-label customwidth">Actual Cost</label>
+
+                	<span class="ideal-field">
+
+                    	<input type="text" name="txtCost" id="txtCost" autocomplete="off">
+
+                	</span>
+
+                </div><?php */?>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <div class="ideal-wrap">
+
+                	<label class="ideal-label customwidth required"><b>* </b>Available Stock</label>
+
+                	<span class="ideal-field">
+
+                    	<input type="text" name="txtStock" id="txtStock" autocomplete="off" class="input-text required-entry validate-number">
+
+                	</span>
+
+                </div>
+
+                <!-- End Field -->
+				
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+
+                	<label class="ideal-label customwidth required"><b>* </b>Book Condition</label>
+
+                	<span class="ideal-field">
+						<?php
+						   //use your own attribute code here 
+						   $attribute_code = "book_condition"; 
+						   $attribute_details = Mage::getSingleton("eav/config")->getAttribute("catalog_product", $attribute_code); 
+						   $options = $attribute_details->getSource()->getAllOptions(false);
+						?>
+                        <select id="cmbbook_condition" name="cmbbook_condition" class="required-entry">
+                        	<option value="">-- Select Book Condition -- </option>
+                          	<?php
+                            foreach($options as $option){
+							?>
+                            	<option value="<?php echo $option["value"]; ?>"><?php echo $option["label"]; ?></option>
+                            <?php
+                            }
+                            ?>  
+                        </select>
+
+                	</span>
+
+                </div>
+                
+                <!-- End Field -->
+                
+                <!-- Start Field -->
+
+                
+
+                <div class="ideal-wrap">
+
+                	<label class="ideal-label customwidth required">Category</label>
+
+                	<span class="ideal-field">
+
+                    	<?php 
+
+							$_helper = Mage::helper('catalog/category');
+
+							$_categories = $_helper->getStoreCategories(); 
+
+							$currentCategory = Mage::registry('current_category');
+
+							if (count($_categories) > 0): // start top level categories
+
+								foreach($_categories as $_category): 
+
+						?>
+
+                			<?php /*?><input class="input-text required-entry" type="checkbox" id="chkCategory[]" name="chkCategory[]" value="<?php echo $_category->getId(); ?>" /><?php echo $_category->getName(); ?><br /><?php */?>	
+							<input type="checkbox" id="chkCategory[]" name="chkCategory[]" value="<?php echo $_category->getId(); ?>" /><?php echo $_category->getName(); ?><br />
+                            <?php
+
+							$_category = Mage::getModel('catalog/category')->load($_category->getId());
+
+							$_subcategories = $_category->getChildrenCategories();
+
+							if (count($_subcategories) > 0): // start second level categories
+
+								foreach($_subcategories as $_subcategory): 
+
+							?>
+
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="chkCategory[]" name="chkCategory[]" value="<?php echo $_subcategory->getId(); ?>" /><?php echo $_subcategory->getName(); ?><br />	
+
+                                
+
+                                <?php
+
+								$_category = Mage::getModel('catalog/category')->load($_subcategory->getId());
+
+								$_subcategories_3 = $_category->getChildrenCategories();
+
+								if (count($_subcategories_3) > 0): // start third level categories
+
+									foreach($_subcategories_3 as $_subcategory): 
+
+								?>
+
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="chkCategory[]" name="chkCategory[]" value="<?php echo $_subcategory->getId(); ?>" /><?php echo $_subcategory->getName(); ?><br />	
+
+								<?php
+
+									endforeach; endif; // end third level categories 
+
+								?>
+
+                                
+
+                            <?php
+
+								endforeach; endif; // end second level categories 
+
+							?>
+
+                        <?php endforeach; endif; // end top level categories ?>    
+
+                        
+
+                	</span>
+
+                </div>
+
+                <!-- End Field -->
+
+                
+
+                
+
+                
+
+                <!-- Start Field -->
+
+                <?php /*?><div class="ideal-wrap" style="display:none;">
+
+                	<label class="ideal-label customwidth">Meta Title</label>
+
+                	<span class="ideal-field">
+
+                		<input type="text" name="txtMetaTitle" id="txtMetaTitle" autocomplete="off">
+
+                	</span>
+
+                </div><?php */?>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+               <?php /*?> <div class="ideal-wrap" style="display:none;">
+
+                	<label class="ideal-label customwidth">Meta Keyword</label>
+
+                	<span class="ideal-field">
+
+                		<input type="text" name="txtMetaKeyword" id="txtMetaKeyword" autocomplete="off">
+
+                	</span>
+
+                </div><?php */?>
+
+                <!-- End Field -->
+
+                <!-- Start Field -->
+
+                <?php /*?><div class="ideal-wrap" style="display:none;">
+
+                	<label class="ideal-label customwidth">Meta Description</label>
+
+                	<span class="ideal-field">
+
+                		<textarea id="textareaMetaDescription" name="textareaMetaDescription" style="width:450px;height:180px;"></textarea>
+
+                	</span>
+
+                </div><?php */?>
+
+                <!-- End Field -->
+
+                
+
+                <!-- Start Field -->
+
+                <div class="ideal-wrap">
+
+                	<label class="ideal-label customwidth">Product Image</label>
+
+                	<span class="ideal-field">
+
+                		<input type="hidden" id="hdnMainImage" name="hdnMainImage"  />
+
+                        <div id="upload" style="margin-right: 25px;">
+
+                            <input type="button" value="Upload Image" id="btnupload" name="btnupload" class="uploadbutton"/>
+
+                        </div>
+
+                        <span id="status" ></span>
+
+                        <ul id="files"></ul>
+
+                	</span>
+
+                </div>
+
+                <!-- End Field -->
+
+                
+
+                
+
+                
+
+                <div class="ideal-wrap">
+
+                  <button type="submit" class="ideal-button" id="btnSubmit" name="btnSubmit">Submit</button>
+
+                  <button type="reset" class="ideal-button" id="btnReset" name="btnReset">Reset</button>
+
+                </div>
+
+            </form>
+			 <script type="text/javascript">
+			//<![CDATA[
+				var dataForm = new VarienForm('vendor-registration', true);
+			//]]>
+			</script>
+        </div>
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+try{
+
+jQuery(function(){		
+
+	var btnUpload=jQuery('#upload');
+
+	var status=jQuery('#status');
+
+	var mediaURL = '<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA); ?>';
+
+	new AjaxUpload(btnUpload, {
+
+		action: '<?php echo $this->getBaseUrl()."upload-file"; ?>',
+
+		//action: 'http://localhost/portal/upload-file',
+
+		name: 'uploadfile',
+
+		onSubmit: function(file, ext){
+
+			 if (! (ext && /^(jpg|png|jpeg|gif)$/.test(ext))){ 
+
+				// extension is not allowed 
+
+				jQuery('#errormsg').html('Only JPG, PNG or GIF files are allowed');
+
+				return false;
+
+			}
+
+			status.text('Uploading...');
+
+		},
+
+		onComplete: function(file, response){
+			//alert("sss");
+			GetResponse = response.split("|#|#|#|#|#");
+			//alert(GetResponse[1]);
+			//On completion clear the status
+
+			jQuery('#files').html("");
+
+			status.text('');
+
+			//Add uploaded file to list
+
+			if(GetResponse[1]==="success"){
+
+				jQuery('<li></li>').appendTo('#files').html('<img style="height:200px;width:140px;" src="'+mediaURL+'uploads/'+file+'"/>');
+
+				document.getElementById("hdnMainImage").value = file;
+
+			} else{
+
+				jQuery('<li></li>').appendTo('#files').text(response).addClass('error');
+
+			}
+
+
+
+		}
+
+	});
+
+});	
+
+}catch(e){
+
+	alert(e);
+
+}
+
+</script>

@@ -1,0 +1,26 @@
+<script type="text/javascript">
+//<![CDATA[
+function toggleMenu(el, over)
+{
+	if (over) {
+		Element.addClassName(el, 'over');
+	}
+	else {
+		Element.removeClassName(el, 'over');
+	}
+}
+//]]>
+</script>
+<div class="block side-nav-categories" id="categories_block_left" >
+	<div class="block-title">
+        <strong><span>Categories</span></strong>
+    </div>
+	<div class="block-content">        
+		<ul id="verticalcollapse">		
+                    <li class="level0 nav-1 active">
+<a href="http://chetanreddy.com/bookconnection/index.php/books.html?___SID=U">
+<span>Books</span>
+</a>
+</li>                </ul>
+	</div>
+</div>

@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Vendor_User>
+            <version>1.0.3</version>
+        </Vendor_User>
+    </modules>
+    <frontend>
+        <routers>
+            <user>
+                <use>standard</use>
+                <args>
+                    <module>Vendor_User</module>
+                    <frontName>user</frontName>
+                </args>
+            </user>
+        </routers>
+        <layout>
+            <updates>
+                <user>
+                    <file>user.xml</file>
+                </user>
+            </updates>
+			<!-- START CODE -->
+			<!--<updates>
+                <feedback>
+                    <file>feedback.xml</file>
+                </feedback>
+            </updates>-->
+			<!-- END CODE -->
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+			<user>
+				<use>admin</use>
+				<args>
+					<module>Vendor_User</module>
+					<frontName>user</frontName>
+				</args>
+			</user>
+        </routers>
+    </admin>
+    <adminhtml>
+		<menu>
+			<user module="user">
+				<title>Vendor</title>
+				<sort_order>71</sort_order>               
+				<children>
+					<items module="user">
+						<title>Manage User</title>
+						<sort_order>0</sort_order>
+						<action>user/adminhtml_user</action>
+					</items>
+					<!-- START CODE -->
+					<!--<items1 module="feedback">
+						<title>Feedback</title>
+						<sort_order>1</sort_order>
+						<action>feedback/adminhtml_feedback</action>
+					</items1>-->	
+					<!-- END CODE -->				
+				</children>
+			</user>
+		</menu>
+		<acl>
+			<resources>
+				<all>
+					<title>Allow Everything</title>
+				</all>
+				<admin>
+					<children>
+						<Vendor_User>
+							<title>User Module</title>
+							<sort_order>10</sort_order>
+						</Vendor_User>
+						<system>
+							<children>
+								<config>
+									<children>
+										<user translate="title" module="user"> 
+											<title>User Settings</title>
+											<sort_order>50</sort_order>
+										</user>
+									</children>							
+								</config>
+							</children>
+						</system>
+					</children>
+					<!-- START CODE -->
+					<!--<children>
+						<Manage_Feedback>
+							<title>Feedback Module</title>
+							<sort_order>10</sort_order>
+						</Manage_Feedback>
+						<system>
+							<children>
+								<config>
+									<children>
+										<feedback translate="title" module="feedback"> 
+											<title>Feedback Settings</title>
+											<sort_order>51</sort_order>
+										</feedback>
+									</children>							
+								</config>
+							</children>
+						</system>
+					</children>-->
+					<!-- END CODE -->
+				</admin>
+			</resources>
+		</acl>
+		<layout>
+			<updates>
+				<user>
+					<file>user.xml</file>
+				</user>
+			</updates>
+			<!-- START CODE -->
+			<!--<updates>
+				<feedback>
+					<file>feedback.xml</file>
+				</feedback>
+			</updates>-->
+			<!-- END CODE -->
+		</layout>
+    </adminhtml>   
+    <global>
+        <models>
+            <user>
+                <class>Vendor_User_Model</class>
+                <resourceModel>user_mysql4</resourceModel>
+            </user>
+            <user_mysql4>
+                <class>Vendor_User_Model_Mysql4</class>
+                <entities>
+                    <user>
+                        <table>vendor_user</table>
+                    </user>
+                </entities>
+            </user_mysql4>
+        </models>
+        <resources>
+            <user_setup>
+                <setup>
+                    <module>Vendor_User</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </user_setup>
+            <user_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </user_write>
+            <user_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </user_read>
+        </resources>
+        <blocks>
+            <user>
+                <class>Vendor_User_Block</class>
+            </user>
+        </blocks>
+        <helpers>
+            <user>
+                <class>Vendor_User_Helper</class>
+            </user>
+        </helpers>
+    </global>
+</config>

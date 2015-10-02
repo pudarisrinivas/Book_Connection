@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+	<tabs>
+        <magentoteam translate="label">
+            <label>Magento Team</label>
+            <sort_order>200</sort_order>
+        </magentoteam>
+    </tabs>
+</config>

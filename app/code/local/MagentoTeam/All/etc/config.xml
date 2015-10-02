@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <MagentoTeam_All>
+            <version>1.0</version>
+        </MagentoTeam_All>
+    </modules>
+	<global>
+		<models>
+		    <magentoteam_all>
+		        <class>MagentoTeam_All_Model</class>
+		    </magentoteam_all>
+		</models>
+		<blocks>
+            <magentoteam_all>
+                <class>MagentoTeam_All_Block</class>
+            </magentoteam_all>
+        </blocks>
+	</global>
+	<frontend>
+        <layout>
+            <updates>
+                <magentoteam_all module="magentoteam_all">
+                    <file>magentoteam.xml</file>
+                </magentoteam_all>
+            </updates>
+        </layout>
+    </frontend>
+</config>

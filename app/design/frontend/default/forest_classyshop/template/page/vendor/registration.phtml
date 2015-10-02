@@ -1,0 +1,110 @@
+<?php session_start(); ?>
+<?php
+$baseurl=Mage::getBaseUrl();
+$resource = Mage::getSingleton('core/resource');
+$writeConnection = $resource->getConnection('core_write');
+$table = $resource->getTableName('vendor_user');
+   
+if(isset($_REQUEST["btnVendorAccount"])){
+	$valEmail = $_REQUEST['txtEmailId'];
+	$email_arr = explode("@",$valEmail);
+	if($email_arr[1]=="missouriwestern.edu"){
+		$query = "INSERT into $table (firstname,lastname,emailid,password,confirmpassword,status,created_time,update_time) values('".$_REQUEST['txtFirstName']."','".$_REQUEST['txtLastName']."','".$_REQUEST['txtEmailId']."','".md5($_REQUEST['txtPassword'])."','".md5($_REQUEST['txtConfirmPassword'])."','1','".date("Y-m-d H:i:s")."','".date("Y-m-d H:i:s")."')"; 
+		$writeConnection->query($query);
+		
+		/* ############# START THIS USER INTO ONWER ATRIBUTE ############# */
+		
+		$lable = $_REQUEST['txtEmailId'];
+		$pa = explode("@",$lable);
+		$arg_attribute = 'owner_product';
+		$manufacturers = array($pa[0]);
+		
+		$attr_model = Mage::getModel('catalog/resource_eav_attribute');
+		$attr = $attr_model->loadByCode('catalog_product', $arg_attribute);
+		$attr_id = $attr->getAttributeId();
+		
+		$option['attribute_id'] = $attr_id;
+		foreach ($manufacturers as $key=>$manufacturer) {
+			$option['value'][$key.'_'.$manufacturer][0] = $manufacturer;
+		}
+		
+		$setup = new Mage_Eav_Model_Entity_Setup('core_setup');
+		$setup->addAttributeOption($option);
+	
+	
+		/* ############# END THIS USER INTO ONWER ATRIBUTE ############# */
+		
+		$_SESSION['msg'] = "Vendor Account is successfully created.";
+	}else{
+		$_SESSION['err'] = "Email must be in valid format. We only accept certains type of email.";
+	}
+	
+}
+?>
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl();?>css/vendor/jquery.idealforms.min.css" type="text/css" />
+<div id="main">
+	<div class="container clearfix">
+        <div class="row">
+        	<?php if(isset($_SESSION['msg'])) { 
+				if($_SESSION['msg']!="") { ?>
+				<div class="success">
+					<?php echo $_SESSION['msg']; ?>
+				</div>
+		 	<?php } } ?>
+            <?php if(isset($_SESSION['err'])) { 
+				if($_SESSION['err']!="") { ?>
+				<div class="error">
+					<?php echo $_SESSION['err']; ?>
+				</div>
+		 	<?php } } ?>
+
+        	<form id="vendor-registration" name="vendor-registration" style="visibility: visible;" class="ideal-form" method="post">
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">First Name</label>
+                	<span class="ideal-field">
+                		<input type="text" name="txtFirstName" id="txtFirstName" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Last Name</label>
+                	<span class="ideal-field">
+                		<input type="text" name="txtLastName" id="txtLastName" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Email Address</label>
+                	<span class="ideal-field">
+                		<input type="text" name="txtEmailId" id="txtEmailId" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Password</label>
+                	<span class="ideal-field">
+                		<input type="password" name="txtPassword" id="txtPassword" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Confirm Password</label>
+                	<span class="ideal-field">
+                		<input type="password" name="txtConfirmPassword" id="txtConfirmPassword" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <div class="ideal-wrap">
+                  <button type="submit" class="ideal-button" autocomplete="off" id="btnVendorAccount" name="btnVendorAccount">Create a Vendor Account</button>
+                </div>
+            </form>
+            <?php $_SESSION['msg']='';?>
+            <?php $_SESSION['err']='';?>
+        </div>
+    </div>
+</div>

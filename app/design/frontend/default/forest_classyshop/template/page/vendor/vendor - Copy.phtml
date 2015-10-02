@@ -1,0 +1,45 @@
+<?php
+$baseurl=Mage::getBaseUrl();
+$resource = Mage::getSingleton('core/resource');
+$writeConnection = $resource->getConnection('core_write');
+$table = $resource->getTableName('vendor_user');
+   
+/*
+if(isset($_REQUEST["btnLogin"])){
+	$query = "INSERT into $table (merchant_fname,merchant_mname,merchant_lname,emailid,password,gender,address,country,state,city,zipcode,phone_no,company_name,company_logo,company_locality,company_description,categories) values('".$_REQUEST['first_name']."','".$_REQUEST['second_name']."','".$_REQUEST['last_name']."','".$_REQUEST['email']."','".md5($_REQUEST['password'])."','".$_REQUEST['gender']."','".$_REQUEST['address']."','".$_REQUEST['country']."','".$_REQUEST['state']."','".$_REQUEST['city']."','".$_REQUEST['zipcode']."','".$_REQUEST['phone']."','".$_REQUEST['company_name']."','".$_REQUEST['company_logo']."','".$_REQUEST['company_locality']."','".$_REQUEST['company_desc']."','".$_REQUEST['company_category']."')"; 
+	$writeConnection->query($query);
+}*/
+?>
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl();?>css/vendor/jquery.idealforms.min.css" type="text/css" />
+<div id="main">
+	<div class="container clearfix">
+        <div class="row">
+        	<form id="vendor-login" name="vendor-login" style="visibility: visible;" class="ideal-form" method="post">
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Email Address</label>
+                	<span class="ideal-field">
+                		<input type="text" name="txtEmailId" id="txtEmailId" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Password</label>
+                	<span class="ideal-field">
+                		<input type="password" name="txtPassword" id="txtPassword" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <div class="ideal-wrap">
+                  <button type="submit" class="ideal-button" autocomplete="off" id="btnLogin" name="btnLogin">Login</button>
+                  <button type="button" id="reset" class="ideal-button" autocomplete="off">Reset</button>
+                </div>
+               
+            </form>
+             <div class="ideal-wrap">
+                <a href="<?php echo $this->getBaseUrl().'vendor-registration'?>">Create A New Account</a>
+            </div>
+        </div>
+    </div>
+</div>

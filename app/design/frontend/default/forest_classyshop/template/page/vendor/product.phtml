@@ -1,0 +1,353 @@
+<?php session_start(); ?>
+
+<?php
+
+$_coreHelper = $this->helper('core');
+
+$baseurl=Mage::getBaseUrl();
+
+$resource = Mage::getSingleton('core/resource');
+
+$writeConnection = $resource->getConnection('core_write');
+
+$table = $resource->getTableName('vendor_user');
+
+function attributeValueExists($arg_attribute, $arg_value)
+{
+	$attribute_model = Mage::getModel('eav/entity_attribute');
+	$attribute_options_model = Mage::getModel('eav/entity_attribute_source_table') ;
+	
+	$attribute_code = $attribute_model->getIdByCode('catalog_product', $arg_attribute);
+	$attribute = $attribute_model->load($attribute_code);
+	
+	$attribute_table = $attribute_options_model->setAttribute($attribute);
+	$options = $attribute_options_model->getAllOptions(false);
+	
+	foreach($options as $option)
+	{
+		if ($option['label'] == $arg_value)
+		{
+			return $option['value'];
+		}
+	}
+	return false;
+}
+
+$customer = Mage::getSingleton('customer/session')->getCustomer();
+$pa = explode("@",$customer->getEmail());
+$cust_name_owner = $pa[0] ;
+$attribute_model = Mage::getModel('eav/entity_attribute');
+$attribute_code = $attribute_model->getIdByCode('catalog_product', 'owner_product');
+$attribute = $attribute_model->load($attribute_code);
+if(!attributeValueExists('owner_product', $cust_name_owner))
+{
+	$value['option'] = array($cust_name_owner);
+	$order['option'] = 0;
+	$result = array('value' => $value,'order' => $order);
+	$attribute->setData('option',$result);
+	$attribute->save();
+}
+   
+
+?>
+
+<?php
+if(isset($_REQUEST['did'])){
+	if($_REQUEST['did']!=""){
+		try{
+			Mage::register('isSecureArea', 1);
+			Mage::getModel("catalog/product")->load($_REQUEST['did'])->delete();
+		}catch(Exception $e){ 
+			echo "Delete failed";
+		}
+		$_SESSION['msg'] = "Product is deleted successfully.";
+		header("Location:" . $baseurl.'product');
+		exit;
+	}
+}
+?>
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl();?>css/vendor/jquery.idealforms.min.css" type="text/css" />
+
+<div id="main">
+
+	<div class="container clearfix">
+
+        <div class="row">
+
+        	<?php if(isset($_SESSION['msg'])) { 
+
+				if($_SESSION['msg']!="") { ?>
+
+				<div class="success">
+
+					<?php echo $_SESSION['msg']; ?>
+
+				</div>
+
+		 	<?php } } ?>
+
+        	<h2>Manage Book</h2>
+
+        	
+
+            <div class="ideal-wrap" style="float:right;">
+
+                <a style="display:inline-block;font-size: 100%;margin-top: 10px;padding: 10px;text-decoration: none;" class="ideal-button" href="<?php echo $this->getBaseUrl().'addproduct'?>">Add Book</a>
+
+                <a style="display:inline-block;font-size: 100%;margin-top: 10px;padding: 10px;text-decoration: none;" class="ideal-button" href="<?php echo $this->getBaseUrl().'customer/account'?>">Dashboard</a>
+
+            </div>
+
+        	
+
+            <div class="gridMain">
+
+        	<?php
+
+			
+
+			/* ############### START CODE TO GET OPTION ID ################# */
+
+			// use your own attribute code here 
+
+			$attribute_code = "owner_product"; 
+
+			$attribute_details = Mage::getSingleton("eav/config")->getAttribute("catalog_product", $attribute_code); 
+
+			$options = $attribute_details->getSource()->getAllOptions(false); 
+
+			foreach($options as $option){ 
+
+				// print_r($option) and find all the elements 
+
+				if($pa[0]==$option["label"]){
+
+					$manuId = $option["value"]; 
+
+				}
+
+				//echo $option["value"]; 
+
+				//echo $option["label"]; 
+
+			} 
+
+			/* ############### END CODE TO GET OPTION ID ############# */
+
+			  
+
+			$_productCollection = Mage::getResourceModel('catalog/product_collection')
+
+				->addAttributeToSelect('*')
+
+				->addAttributeToFilter('owner_product', array('eq'=> $manuId)) // $manuId: printing manufacturer's id
+
+				->setOrder('created_at', 'desc')
+
+				->joinField('qty',
+
+                 'cataloginventory/stock_item',
+
+                 'qty',
+
+                 'product_id=entity_id',
+
+                 '{{table}}.stock_id=1',
+
+                 'left'); 
+
+			?>
+
+        	<table class="gridHeader" width="100%">
+
+            	<tr>
+
+                	<th width="7%">
+
+                        Image
+
+                    </th>
+
+                	<th width="5%">
+
+                        ID
+
+                    </th>
+
+                    <th width="25%">
+
+                        Name
+
+                    </th>
+
+                    <th width="9%">
+
+                        Sku
+
+                    </th>
+
+                    <th width="9%">
+
+                        Price
+
+                    </th>
+
+                    <th width="8%">
+
+                        Qty
+
+                    </th>
+
+                    <th width="8%">
+
+						Status
+
+                    </th>
+
+                    <th width="25%">
+
+						Category
+
+                    </th>
+                    <th width="25%">
+
+						Action
+
+                    </th>
+
+                    <?php /*?><th>
+
+                        Action
+
+                    </th><?php */?>
+
+                </tr>
+
+                <?php if(count($_productCollection)==0){ ?>
+
+                    <tr>
+
+                        <td colspan="10" class="ErrorLableStyle">
+
+                            <?php echo "No Product Found"; ?>
+
+                        </td>
+
+                    </tr>
+
+                <?php } else { ?>
+
+         			<?php foreach($_productCollection as $_product) { ?>   	
+
+                        <tr class="row_hover">
+
+                            <td>
+
+                               <img src="<?php echo $this->helper('catalog/image')->init($_product, 'thumbnail')->resize(100); ?>"  alt="<?php echo $_product->getName(); ?>"/>
+
+                            </td>
+
+                            <td>
+
+                                <?php echo $_product->getId(); ?>
+
+                            </td>
+
+                            <td>
+
+                                <?php echo $_product->getName(); ?>
+
+                            </td>
+
+                            <td>
+
+                                <?php echo $_product->getSku(); ?>
+
+                            </td>
+
+                            <td>
+
+								<?php echo $_coreHelper->currency($_product->getPrice(),true,false);?>                            
+
+                            </td>
+
+                            <td>
+
+                                <?php echo $_product->getQty(); ?>
+
+                            </td>
+
+                            <td>
+
+                            	<?php
+
+								if($_product->getStatus()==1){
+
+									echo "Enable";
+
+								}else{
+
+									echo "Disable";
+
+								}
+
+								?>
+
+                            </td>
+
+                            <td>
+
+                            	<?php
+
+								$cats = $_product->getCategoryIds();
+
+								$category = "";
+
+								foreach ($cats as $category_id) {
+
+									$_cat = Mage::getModel('catalog/category')->load($category_id) ;
+
+									$category .= $_cat->getName().", ";
+
+								} 
+
+								echo substr($category,0,strlen($category)-2);
+
+								?>
+
+                            </td>
+							
+                            <td>
+                            	<a href="<?php echo Mage::getBaseUrl().'product?did='.$_product->getId(); ?>">Delete</a>
+                            </td>
+                            <?php /*?><td>
+
+                                <a class="GridEditButton" href="<?php echo $WEB_PATH."/property-edit.php?id=".$Row->appPropertyId;?>"></a>
+
+
+
+                                &nbsp;
+
+                                <a class="GridDeleteButton" href="<?php echo $WEB_PATH."/process.php?btnDeleteProperty=yes&id=".$Row->appPropertyId;?>"></a>
+
+                            </td><?php */?>
+
+                         </tr>
+
+           			<?php } //foreach?>
+
+				<?php } ?>
+
+            </table>
+
+        </div>
+
+            
+
+        </div>
+
+    </div>
+
+</div>
+
+<?php $_SESSION['msg']='';?>

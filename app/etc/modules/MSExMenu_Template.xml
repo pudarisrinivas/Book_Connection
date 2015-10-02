@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <MSExMenu_Template>
+            <active>true</active>
+            <codePool>local</codePool>
+        </MSExMenu_Template>
+    </modules>
+</config>

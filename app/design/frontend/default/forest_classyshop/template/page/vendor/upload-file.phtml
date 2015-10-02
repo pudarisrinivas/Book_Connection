@@ -1,0 +1,107 @@
+<?php
+
+echo "|#|#|#|#|#";
+
+$uploaddir = 'media/uploads/'; 
+
+
+
+$file = $uploaddir .$_FILES['uploadfile']['name']; 
+
+
+
+if (move_uploaded_file($_FILES['uploadfile']['tmp_name'], $file)) { 
+
+ 	 echo "success"; 
+
+} else {
+
+	echo "error";
+
+}
+
+
+
+//
+
+//			$uploading_path = $uploaddir.$_FILES['uploadfile']['name']; 
+
+//			if (file_exists($uploading_path))
+
+//			{
+
+//				echo "File already exists";
+
+//			}
+
+//			else
+
+//			{
+
+//				if(move_uploaded_file($_FILES["uploadfile"]["tmp_name"],$uploading_path))
+
+//				{
+
+//					$dest = "thumbs/".$_FILES['uploadfile']['name'];
+
+//					create_thumbnail($uploading_path,$dest);
+
+//					 echo "success";					
+
+//				}
+
+//				else
+
+//				{
+
+//					echo "Error inn uploading image";	
+
+//				}
+
+//			}
+
+////			echo "success";
+
+//
+
+//
+
+//function create_thumbnail($src,$dest)
+
+//{
+
+//	  $source_image = imagecreatefromjpeg($src);
+
+//	  $width = imagesx($source_image);
+
+//	  $height = imagesy($source_image);
+
+//	  //$desired_width =270;
+
+//	  $desired_width =320;
+
+//	  /* find the "desired height" of this thumbnail, relative to the desired width  */
+
+//	  //$desired_height = floor($height*($desired_width/$width));
+
+//	  //$desired_height = 368;
+
+//	  $desired_height = 390;
+
+//	  /* create a new, "virtual" image */
+
+//	  $virtual_image = imagecreatetruecolor($desired_width,$desired_height);
+
+//	  
+
+//	  /* copy source image at a resized size */
+
+//	  imagecopyresized($virtual_image,$source_image,0,0,0,0,$desired_width,$desired_height,$width,$height);
+
+//      imagejpeg($virtual_image,$dest); 
+
+//}
+
+echo "|#|#|#|#|#";
+
+?>

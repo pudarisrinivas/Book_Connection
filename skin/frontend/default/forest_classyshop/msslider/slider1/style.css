@@ -1,0 +1,52 @@
+.msslider { 
+	overflow:hidden; 
+	zoom:1; 
+	position:relative; 
+	height:406px; 
+}
+.msslider a{ 
+	text-decoration:none; 
+	outline:none; 
+	border:none; 
+}
+
+.cs-buttons { 
+	font-size:0px; 
+	padding-right:10px; 
+	float:right; 
+	bottom:25px; 
+}
+.cs-buttons a { 
+	margin-left:5px; 
+	height:18px; 
+	width:18px;
+	float:left; 
+	color:#B8C4CF; 
+	text-indent:-1000px; 
+	background:url(arrows-square.png) no-repeat left top; 
+}
+.cs-buttons a.cs-active { 
+	color:#FFFFFF; 
+	background:url(arrows-square.png) no-repeat 0px -18px; 
+}
+
+.cs-title{ 
+	width:545px; 
+	padding:10px; 
+	background-color:#000000; 
+	color:#FFFFFF; 
+	display:none; 
+}
+
+.cs-prev { 
+	background:url(arrows-metallic.png) no-repeat 0px 0px; 
+	width:36px; 
+	height:36px;
+}
+.cs-prev:hover { background:url(arrows-metallic.png) no-repeat 0px -35px; }
+.cs-next { 
+	background:url(arrows-metallic.png) no-repeat -43px 0px; 
+	width:36px; 
+	height:36px; 
+}
+.cs-next:hover { background:url(arrows-metallic.png) no-repeat -43px -35px; }

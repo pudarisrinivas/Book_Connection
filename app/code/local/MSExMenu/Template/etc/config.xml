@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<MSExMenu_Template>
+			<version>1.0</version>
+		</MSExMenu_Template>
+	</modules>
+	<global>
+
+		<helpers>
+			<msexmenu_template>
+				<class>MSExMenu_Template_Helper</class>
+			</msexmenu_template>
+		</helpers>
+
+
+		<blocks>
+            <catalog>
+                <rewrite>
+                    <navigation>MSExMenu_Template_Block_Navigation</navigation>
+                </rewrite>
+            </catalog>
+
+			<msexmenu_template><class>MSExMenu_Template_Block</class></msexmenu_template>
+			<msexmenu_template_admin><class>MSExMenu_Template_Block_Adminhtml</class></msexmenu_template_admin>
+		</blocks>
+
+	</global>
+
+	<frontend>
+		<layout>
+			<updates>
+				<msexmenu_template>
+					<file>msexmenu.xml</file>
+				</msexmenu_template>
+			</updates>
+		</layout>
+		<translate> 
+			<modules> 
+				<MSExMenu_Template> 
+					<files> 
+						<default>MSExMenu_Template.csv</default> 
+					</files> 
+				</MSExMenu_Template> 
+			</modules> 
+		</translate>
+	</frontend>  
+	
+</config>

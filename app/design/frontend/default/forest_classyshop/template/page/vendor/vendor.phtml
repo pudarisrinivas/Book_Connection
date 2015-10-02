@@ -1,0 +1,80 @@
+<?php session_start(); ?>
+<?php
+$_SESSION['msg']="";
+$_SESSION['fn']="";
+$_SESSION['fn']="";
+?>
+<?php
+$baseurl=Mage::getBaseUrl();
+$resource = Mage::getSingleton('core/resource');
+$readConnection = $resource->getConnection('core_read');
+$writeConnection = $resource->getConnection('core_write');
+$table = $resource->getTableName('vendor_user');
+   
+
+if(isset($_REQUEST["btnLogin"])){
+	$query = "select * from $table where emailid = '".$_REQUEST['txtEmailId']."' and status='1' and password = '".md5($_REQUEST['txtPassword'])."'";
+	$results = $readConnection->fetchAll($query);
+	
+	if(count($results)>0){
+		for($ic=0;$ic<count($results);$ic++){
+			$vendor_user_id = $results[$ic]['vendor_user_id'];
+			$firstname = $results[$ic]['firstname'];
+			$lastname = $results[$ic]['lastname'];
+			$emailid = $results[$ic]['emailid'];
+			$status = $results[$ic]['status'];
+			
+			$lable = $emailid;
+			$pa = explode("@",$lable);
+			$_SESSION['fn'] = $firstname;
+			$_SESSION['un'] = $pa[0];
+		}
+		header("Location:" . $baseurl.'dashboard');
+		exit;
+	}
+	else{
+		$_SESSION['msg'] = "Invalid Login";
+	}
+	
+}
+?>
+<link rel="stylesheet" href="<?php echo $this->getSkinUrl();?>css/vendor/jquery.idealforms.min.css" type="text/css" />
+<div id="main">
+	<div class="container clearfix">
+        <div class="row">
+        	<?php if(isset($_SESSION['msg'])) { 
+				if($_SESSION['msg']!="") { ?>
+				<div class="error">
+					<?php echo $_SESSION['msg']; ?>
+				</div>
+		 	<?php } } ?>
+        	<form id="vendor-login" name="vendor-login" style="visibility: visible;" class="ideal-form" method="post">
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Email Address</label>
+                	<span class="ideal-field">
+                		<input type="text" name="txtEmailId" id="txtEmailId" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <!-- Start Field -->
+                <div class="ideal-wrap">
+                	<label class="ideal-label customwidth">Password</label>
+                	<span class="ideal-field">
+                		<input type="password" name="txtPassword" id="txtPassword" autocomplete="off">
+                	</span>
+                </div>
+                <!-- End Field -->
+                <div class="ideal-wrap">
+                  <button type="submit" class="ideal-button" autocomplete="off" id="btnLogin" name="btnLogin">Login</button>
+                  <button type="button" id="reset" class="ideal-button" autocomplete="off">Reset</button>
+                </div>
+               
+            </form>
+            <?php $_SESSION['msg']='';?>
+             <div class="ideal-wrap">
+                <a href="<?php echo $this->getBaseUrl().'vendor-registration'?>">Create A New Account</a>
+            </div>
+        </div>
+    </div>
+</div>

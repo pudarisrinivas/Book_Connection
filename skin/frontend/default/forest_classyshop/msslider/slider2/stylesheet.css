@@ -1,0 +1,38 @@
+﻿.scrolling-slider{
+	background:url(../../images/brandbg.gif) no-repeat left center;
+	margin-bottom:10px;
+	width:990px;
+	height:79px;
+	padding-top:8px;
+	margin-bottom:10px;
+	
+}
+.stepcarousel{
+	position: relative; 	
+	overflow: scroll; 
+	width: 920px; 
+	height:70px; 
+	margin-left:35px;
+}
+
+.category-products .stepcarousel{
+	position: relative; 	
+	overflow: scroll; 
+	width: 986px; 
+	/*height:260px; */
+	height:330px;
+	margin-left:15px;
+}
+
+.category-products .stepcarousel .belt{
+	position: absolute; 
+	left: 0;
+	top: 0;
+}
+
+.category-products .stepcarousel .panel{
+	float: left; 
+	/*overflow: hidden; */
+	margin: 4px;
+	width: 194px;
+}
